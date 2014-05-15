@@ -18,3 +18,13 @@ webapps
 
 nb-configuration.xml
 nbactions-*.xml
+
+// Dart
+packages/
+pubspec.lock  // except for application packages
+.project
+.buildlog
+*.js_
+*.js.deps
+*.js.map 
+*.dart.js
