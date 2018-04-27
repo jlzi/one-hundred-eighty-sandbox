@@ -1,1 +1,1 @@
-# 5cm.ru Image Scanner
+# 5cm.ru Images Scanner
