@@ -5,12 +5,11 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-/**
- * Created by syaskov on 13.05.2014.
- */
 public class StringGenerator {
 
-    private final BlockingQueue<String> outcome = new ArrayBlockingQueue<>(1024);
+    private static final int LENGTH_OF_WORDS = 4;
+
+    private final BlockingQueue<String> words = new ArrayBlockingQueue<>(1024);
 
     public void start() {
         final List<Character> alphabet = new ArrayList<>();
@@ -25,55 +24,38 @@ public class StringGenerator {
             alphabet.add(c);
         }
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                printAllKLength(alphabet.toArray(new Character[alphabet.size()]), 4);
-            }
-        });
+        Thread thread = new Thread(() -> allPossibleWords(alphabet.toArray(new Character[alphabet.size()]), LENGTH_OF_WORDS));
         thread.setDaemon(true); // TODO how the daemon thread is interrupted?
         thread.start();
     }
 
     public String next() {
         try {
-            return outcome.take();
+            return words.take();
         } catch (InterruptedException e) {
             e.printStackTrace(); // TODO
             return null;
         }
     }
 
-    // The method that prints all possible strings of length k.  It is
-    //  mainly a wrapper over recursive function printAllKLengthRec()
-    private void printAllKLength(Character set[], int k) {
-        int n = set.length;
-        printAllKLengthRec(set, "", n, k);
+    private void allPossibleWords(Character[] alphabet, int length) {
+        int n = alphabet.length;
+        allPossibleWords(alphabet, "", n, length);
     }
 
-    // The main recursive method to print all possible strings of length k
-    private void printAllKLengthRec(Character set[], String prefix, int n, int k) {
-
-        // Base case: k is 0, print prefix
-        if (k == 0) {
+    private void allPossibleWords(Character[] alphabet, String prefix, int n, int length) {
+        if (length == 0) {
             try {
-                outcome.put(prefix);
-            } catch (InterruptedException e) {
+                words.put(prefix);
+            } catch (final InterruptedException e) {
                 e.printStackTrace(); // TODO
             }
             return;
         }
 
-        // One by one add all characters from set and recursively
-        // call for k equals to k-1
         for (int i = 0; i < n; ++i) {
-
-            // Next character of input added
-            String newPrefix = prefix + set[i];
-
-            // k is decreased, because we have added a new character
-            printAllKLengthRec(set, newPrefix, n, k - 1);
+            String newPrefix = prefix + alphabet[i];
+            allPossibleWords(alphabet, newPrefix, n, length - 1);
         }
     }
-
 }
